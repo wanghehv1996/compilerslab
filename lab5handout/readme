@@ -1,0 +1,42 @@
+
+Now look around. Here is a list of files you need to modify:
+
+frame.h: basic definitions for frame data structure. 
+
+x86frame.c:	specialized implementation for frame atop x86 architecture.
+
+semant.[ch]: you should modify them to generate IR trees while type checking. 
+
+One thing to note is that now SEM_transProg returns a list of fragments instead:
+
+in semant.h:
+- void SEM_transProg(A_exp exp);
++ F_fragList SEM_transProg(A_exp exp);
+Please check semant.[ch] in handout_lab5/ for more details. 
+
+translate.[ch]:	translating abstract syntax nodes into IR tree nodes. 
+
+escape.[ch] (Optional): Escape analysis for variables. It is optional because you can always guarantee correctness by assuming that all variables escape. We don't provide skeleton files for escape.[ch] here. If you want to implement the Escape module, please modify makefile to include it. 
+
+In addition, we will reuse your code in previous labs. Please merge them to the working directory.
+Testing
+The testing for a (part of) compiler backend is difficult. Unlike AST and type checking, there is no standard output for IR trees. Thus, we only provide a very simple test in this part. A more complete test will be conducted after code generation. In this lab, we ask you to count the number of fragments (both string fragments and proc fragments) and print out. 
+We've provided a script file called gradeMe.sh for testing. 
+$ ./gradeMe.sh
+Your output:
+0
+Expected output:
+19
+[*_*]: Output Mismatch [merge.tig]
+The output suggests that merge.tig has 19 fragments in all.
+$ ./gradeMe.sh 
+[^_^]: Pass Lab5
+The smiling face implies that you have passed all the test on Tiger code files in /testcases.
+Handin procedure
+Submit your code to ftp://followmoon:public@public.sjtu.edu.cn/upload/lab5. You should archive your code as a gzipped tar file with the following command before submission:
+
+$ cd handout_lab5/
+$ make handin
+And rename the id.name.tar.gz with your name and student number. 
+
+You will receive full credit if your code passes the test in gradeMe.sh when running on our machines. We will use the timestamp of your last submission for the purpose of calculating late days.

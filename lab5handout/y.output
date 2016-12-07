@@ -1,0 +1,2711 @@
+   0  $accept : program $end
+
+   1  program : exp
+
+   2  id : ID
+
+   3  exp : lvalue
+   4      | NIL
+   5      | INT
+   6      | STRING
+   7      | MINUS exp
+   8      | LPAREN seqexp RPAREN
+   9      | exp OR exp
+  10      | exp AND exp
+  11      | exp PLUS exp
+  12      | exp MINUS exp
+  13      | exp TIMES exp
+  14      | exp DIVIDE exp
+  15      | exp EQ exp
+  16      | exp NEQ exp
+  17      | exp LT exp
+  18      | exp GT exp
+  19      | exp LE exp
+  20      | exp GE exp
+  21      | id LPAREN explist RPAREN
+  22      | id LBRACE efieldlist RBRACE
+  23      | lvalue ASSIGN exp
+  24      | id LBRACK exp RBRACK OF exp
+  25      | IF exp THEN exp ELSE exp
+  26      | IF exp THEN exp
+  27      | WHILE exp DO exp
+  28      | FOR id ASSIGN exp TO exp DO exp
+  29      | BREAK
+  30      | LET declist IN seqexp END
+
+  31  lvalue : id
+  32         | lvalue DOT id
+  33         | id LBRACK exp RBRACK
+  34         | lvalue LBRACK exp RBRACK
+
+  35  efield :
+  36         | id EQ exp
+
+  37  efieldlist : efield
+  38             | efield COMMA efieldlist
+
+  39  explist :
+  40          | exp
+  41          | exp COMMA explist
+
+  42  expseq :
+  43         | exp
+  44         | exp SEMICOLON expseq
+
+  45  seqexp : expseq
+
+  46  declist : dec
+  47          | dec declist
+
+  48  dec : VAR id ASSIGN exp
+  49      | VAR id COLON id ASSIGN exp
+  50      | fundeclist
+  51      | tydeclist
+
+  52  ty : id
+  53     | LBRACE tyfields RBRACE
+  54     | ARRAY OF id
+
+  55  tyfield : id COLON id
+
+  56  tyfields :
+  57           | tyfield
+  58           | tyfield COMMA tyfields
+
+  59  fundec : FUNCTION id LPAREN tyfields RPAREN EQ exp
+  60         | FUNCTION id LPAREN tyfields RPAREN COLON id EQ exp
+
+  61  fundeclist : fundec
+  62             | fundec fundeclist
+
+  63  tydec : TYPE id EQ ty
+
+  64  tydeclist : tydec
+  65            | tydec tydeclist
+
+state 0
+	$accept : . program $end  (0)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	program  goto 12
+	exp  goto 13
+	lvalue  goto 14
+	id  goto 15
+
+
+state 1
+	id : ID .  (2)
+
+	.  reduce 2
+
+
+state 2
+	exp : STRING .  (6)
+
+	.  reduce 6
+
+
+state 3
+	exp : INT .  (5)
+
+	.  reduce 5
+
+
+state 4
+	exp : LPAREN . seqexp RPAREN  (8)
+	expseq : .  (42)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	RPAREN  reduce 42
+
+	exp  goto 16
+	seqexp  goto 17
+	expseq  goto 18
+	lvalue  goto 14
+	id  goto 15
+
+
+state 5
+	exp : MINUS . exp  (7)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 19
+	lvalue  goto 14
+	id  goto 15
+
+
+state 6
+	exp : IF . exp THEN exp ELSE exp  (25)
+	exp : IF . exp THEN exp  (26)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 20
+	lvalue  goto 14
+	id  goto 15
+
+
+state 7
+	exp : WHILE . exp DO exp  (27)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 21
+	lvalue  goto 14
+	id  goto 15
+
+
+state 8
+	exp : FOR . id ASSIGN exp TO exp DO exp  (28)
+
+	ID  shift 1
+	.  error
+
+	id  goto 22
+
+
+state 9
+	exp : LET . declist IN seqexp END  (30)
+
+	FUNCTION  shift 23
+	VAR  shift 24
+	TYPE  shift 25
+	.  error
+
+	dec  goto 26
+	declist  goto 27
+	fundec  goto 28
+	fundeclist  goto 29
+	tydec  goto 30
+	tydeclist  goto 31
+
+
+state 10
+	exp : BREAK .  (29)
+
+	.  reduce 29
+
+
+state 11
+	exp : NIL .  (4)
+
+	.  reduce 4
+
+
+state 12
+	$accept : program . $end  (0)
+
+	$end  accept
+
+
+state 13
+	program : exp .  (1)
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	$end  reduce 1
+
+
+state 14
+	exp : lvalue .  (3)
+	exp : lvalue . ASSIGN exp  (23)
+	lvalue : lvalue . DOT id  (32)
+	lvalue : lvalue . LBRACK exp RBRACK  (34)
+
+	LBRACK  shift 44
+	DOT  shift 45
+	ASSIGN  shift 46
+	$end  reduce 3
+	COMMA  reduce 3
+	SEMICOLON  reduce 3
+	RPAREN  reduce 3
+	RBRACK  reduce 3
+	RBRACE  reduce 3
+	PLUS  reduce 3
+	MINUS  reduce 3
+	TIMES  reduce 3
+	DIVIDE  reduce 3
+	EQ  reduce 3
+	NEQ  reduce 3
+	LT  reduce 3
+	LE  reduce 3
+	GT  reduce 3
+	GE  reduce 3
+	AND  reduce 3
+	OR  reduce 3
+	THEN  reduce 3
+	ELSE  reduce 3
+	TO  reduce 3
+	DO  reduce 3
+	IN  reduce 3
+	END  reduce 3
+	FUNCTION  reduce 3
+	VAR  reduce 3
+	TYPE  reduce 3
+
+
+15: shift/reduce conflict (shift 48, reduce 31) on LBRACK
+state 15
+	exp : id . LPAREN explist RPAREN  (21)
+	exp : id . LBRACE efieldlist RBRACE  (22)
+	exp : id . LBRACK exp RBRACK OF exp  (24)
+	lvalue : id .  (31)
+	lvalue : id . LBRACK exp RBRACK  (33)
+
+	LPAREN  shift 47
+	LBRACK  shift 48
+	LBRACE  shift 49
+	$end  reduce 31
+	COMMA  reduce 31
+	SEMICOLON  reduce 31
+	RPAREN  reduce 31
+	RBRACK  reduce 31
+	RBRACE  reduce 31
+	DOT  reduce 31
+	PLUS  reduce 31
+	MINUS  reduce 31
+	TIMES  reduce 31
+	DIVIDE  reduce 31
+	EQ  reduce 31
+	NEQ  reduce 31
+	LT  reduce 31
+	LE  reduce 31
+	GT  reduce 31
+	GE  reduce 31
+	AND  reduce 31
+	OR  reduce 31
+	ASSIGN  reduce 31
+	THEN  reduce 31
+	ELSE  reduce 31
+	TO  reduce 31
+	DO  reduce 31
+	IN  reduce 31
+	END  reduce 31
+	FUNCTION  reduce 31
+	VAR  reduce 31
+	TYPE  reduce 31
+
+
+state 16
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	expseq : exp .  (43)
+	expseq : exp . SEMICOLON expseq  (44)
+
+	SEMICOLON  shift 50
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	RPAREN  reduce 43
+	END  reduce 43
+
+
+state 17
+	exp : LPAREN seqexp . RPAREN  (8)
+
+	RPAREN  shift 51
+	.  error
+
+
+state 18
+	seqexp : expseq .  (45)
+
+	.  reduce 45
+
+
+state 19
+	exp : MINUS exp .  (7)
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	.  reduce 7
+
+
+state 20
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : IF exp . THEN exp ELSE exp  (25)
+	exp : IF exp . THEN exp  (26)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	THEN  shift 52
+	.  error
+
+
+state 21
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : WHILE exp . DO exp  (27)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	DO  shift 53
+	.  error
+
+
+state 22
+	exp : FOR id . ASSIGN exp TO exp DO exp  (28)
+
+	ASSIGN  shift 54
+	.  error
+
+
+state 23
+	fundec : FUNCTION . id LPAREN tyfields RPAREN EQ exp  (59)
+	fundec : FUNCTION . id LPAREN tyfields RPAREN COLON id EQ exp  (60)
+
+	ID  shift 1
+	.  error
+
+	id  goto 55
+
+
+state 24
+	dec : VAR . id ASSIGN exp  (48)
+	dec : VAR . id COLON id ASSIGN exp  (49)
+
+	ID  shift 1
+	.  error
+
+	id  goto 56
+
+
+state 25
+	tydec : TYPE . id EQ ty  (63)
+
+	ID  shift 1
+	.  error
+
+	id  goto 57
+
+
+state 26
+	declist : dec .  (46)
+	declist : dec . declist  (47)
+
+	FUNCTION  shift 23
+	VAR  shift 24
+	TYPE  shift 25
+	IN  reduce 46
+
+	dec  goto 26
+	declist  goto 58
+	fundec  goto 28
+	fundeclist  goto 29
+	tydec  goto 30
+	tydeclist  goto 31
+
+
+state 27
+	exp : LET declist . IN seqexp END  (30)
+
+	IN  shift 59
+	.  error
+
+
+28: shift/reduce conflict (shift 23, reduce 61) on FUNCTION
+state 28
+	fundeclist : fundec .  (61)
+	fundeclist : fundec . fundeclist  (62)
+
+	FUNCTION  shift 23
+	IN  reduce 61
+	VAR  reduce 61
+	TYPE  reduce 61
+
+	fundec  goto 28
+	fundeclist  goto 60
+
+
+state 29
+	dec : fundeclist .  (50)
+
+	.  reduce 50
+
+
+30: shift/reduce conflict (shift 25, reduce 64) on TYPE
+state 30
+	tydeclist : tydec .  (64)
+	tydeclist : tydec . tydeclist  (65)
+
+	TYPE  shift 25
+	IN  reduce 64
+	FUNCTION  reduce 64
+	VAR  reduce 64
+
+	tydec  goto 30
+	tydeclist  goto 61
+
+
+state 31
+	dec : tydeclist .  (51)
+
+	.  reduce 51
+
+
+state 32
+	exp : exp PLUS . exp  (11)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 62
+	lvalue  goto 14
+	id  goto 15
+
+
+state 33
+	exp : exp MINUS . exp  (12)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 63
+	lvalue  goto 14
+	id  goto 15
+
+
+state 34
+	exp : exp TIMES . exp  (13)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 64
+	lvalue  goto 14
+	id  goto 15
+
+
+state 35
+	exp : exp DIVIDE . exp  (14)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 65
+	lvalue  goto 14
+	id  goto 15
+
+
+state 36
+	exp : exp EQ . exp  (15)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 66
+	lvalue  goto 14
+	id  goto 15
+
+
+state 37
+	exp : exp NEQ . exp  (16)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 67
+	lvalue  goto 14
+	id  goto 15
+
+
+state 38
+	exp : exp LT . exp  (17)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 68
+	lvalue  goto 14
+	id  goto 15
+
+
+state 39
+	exp : exp LE . exp  (19)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 69
+	lvalue  goto 14
+	id  goto 15
+
+
+state 40
+	exp : exp GT . exp  (18)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 70
+	lvalue  goto 14
+	id  goto 15
+
+
+state 41
+	exp : exp GE . exp  (20)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 71
+	lvalue  goto 14
+	id  goto 15
+
+
+state 42
+	exp : exp AND . exp  (10)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 72
+	lvalue  goto 14
+	id  goto 15
+
+
+state 43
+	exp : exp OR . exp  (9)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 73
+	lvalue  goto 14
+	id  goto 15
+
+
+state 44
+	lvalue : lvalue LBRACK . exp RBRACK  (34)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 74
+	lvalue  goto 14
+	id  goto 15
+
+
+state 45
+	lvalue : lvalue DOT . id  (32)
+
+	ID  shift 1
+	.  error
+
+	id  goto 75
+
+
+state 46
+	exp : lvalue ASSIGN . exp  (23)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 76
+	lvalue  goto 14
+	id  goto 15
+
+
+state 47
+	exp : id LPAREN . explist RPAREN  (21)
+	explist : .  (39)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	RPAREN  reduce 39
+
+	exp  goto 77
+	explist  goto 78
+	lvalue  goto 14
+	id  goto 15
+
+
+state 48
+	exp : id LBRACK . exp RBRACK OF exp  (24)
+	lvalue : id LBRACK . exp RBRACK  (33)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 79
+	lvalue  goto 14
+	id  goto 15
+
+
+state 49
+	exp : id LBRACE . efieldlist RBRACE  (22)
+	efield : .  (35)
+
+	ID  shift 1
+	COMMA  reduce 35
+	RBRACE  reduce 35
+
+	efieldlist  goto 80
+	efield  goto 81
+	id  goto 82
+
+
+state 50
+	expseq : exp SEMICOLON . expseq  (44)
+	expseq : .  (42)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	RPAREN  reduce 42
+	END  reduce 42
+
+	exp  goto 16
+	expseq  goto 83
+	lvalue  goto 14
+	id  goto 15
+
+
+state 51
+	exp : LPAREN seqexp RPAREN .  (8)
+
+	.  reduce 8
+
+
+state 52
+	exp : IF exp THEN . exp ELSE exp  (25)
+	exp : IF exp THEN . exp  (26)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 84
+	lvalue  goto 14
+	id  goto 15
+
+
+state 53
+	exp : WHILE exp DO . exp  (27)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 85
+	lvalue  goto 14
+	id  goto 15
+
+
+state 54
+	exp : FOR id ASSIGN . exp TO exp DO exp  (28)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 86
+	lvalue  goto 14
+	id  goto 15
+
+
+state 55
+	fundec : FUNCTION id . LPAREN tyfields RPAREN EQ exp  (59)
+	fundec : FUNCTION id . LPAREN tyfields RPAREN COLON id EQ exp  (60)
+
+	LPAREN  shift 87
+	.  error
+
+
+state 56
+	dec : VAR id . ASSIGN exp  (48)
+	dec : VAR id . COLON id ASSIGN exp  (49)
+
+	COLON  shift 88
+	ASSIGN  shift 89
+	.  error
+
+
+state 57
+	tydec : TYPE id . EQ ty  (63)
+
+	EQ  shift 90
+	.  error
+
+
+state 58
+	declist : dec declist .  (47)
+
+	.  reduce 47
+
+
+state 59
+	exp : LET declist IN . seqexp END  (30)
+	expseq : .  (42)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	END  reduce 42
+
+	exp  goto 16
+	seqexp  goto 91
+	expseq  goto 18
+	lvalue  goto 14
+	id  goto 15
+
+
+state 60
+	fundeclist : fundec fundeclist .  (62)
+
+	.  reduce 62
+
+
+state 61
+	tydeclist : tydec tydeclist .  (65)
+
+	.  reduce 65
+
+
+state 62
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp PLUS exp .  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	TIMES  shift 34
+	DIVIDE  shift 35
+	$end  reduce 11
+	COMMA  reduce 11
+	SEMICOLON  reduce 11
+	RPAREN  reduce 11
+	RBRACK  reduce 11
+	RBRACE  reduce 11
+	PLUS  reduce 11
+	MINUS  reduce 11
+	EQ  reduce 11
+	NEQ  reduce 11
+	LT  reduce 11
+	LE  reduce 11
+	GT  reduce 11
+	GE  reduce 11
+	AND  reduce 11
+	OR  reduce 11
+	THEN  reduce 11
+	ELSE  reduce 11
+	TO  reduce 11
+	DO  reduce 11
+	IN  reduce 11
+	END  reduce 11
+	FUNCTION  reduce 11
+	VAR  reduce 11
+	TYPE  reduce 11
+
+
+state 63
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp MINUS exp .  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	TIMES  shift 34
+	DIVIDE  shift 35
+	$end  reduce 12
+	COMMA  reduce 12
+	SEMICOLON  reduce 12
+	RPAREN  reduce 12
+	RBRACK  reduce 12
+	RBRACE  reduce 12
+	PLUS  reduce 12
+	MINUS  reduce 12
+	EQ  reduce 12
+	NEQ  reduce 12
+	LT  reduce 12
+	LE  reduce 12
+	GT  reduce 12
+	GE  reduce 12
+	AND  reduce 12
+	OR  reduce 12
+	THEN  reduce 12
+	ELSE  reduce 12
+	TO  reduce 12
+	DO  reduce 12
+	IN  reduce 12
+	END  reduce 12
+	FUNCTION  reduce 12
+	VAR  reduce 12
+	TYPE  reduce 12
+
+
+state 64
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp TIMES exp .  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	.  reduce 13
+
+
+state 65
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp DIVIDE exp .  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	.  reduce 14
+
+
+state 66
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp EQ exp .  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	$end  reduce 15
+	COMMA  reduce 15
+	SEMICOLON  reduce 15
+	RPAREN  reduce 15
+	RBRACK  reduce 15
+	RBRACE  reduce 15
+	EQ  reduce 15
+	NEQ  reduce 15
+	LT  reduce 15
+	LE  reduce 15
+	GT  reduce 15
+	GE  reduce 15
+	AND  reduce 15
+	OR  reduce 15
+	THEN  reduce 15
+	ELSE  reduce 15
+	TO  reduce 15
+	DO  reduce 15
+	IN  reduce 15
+	END  reduce 15
+	FUNCTION  reduce 15
+	VAR  reduce 15
+	TYPE  reduce 15
+
+
+state 67
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp NEQ exp .  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	$end  reduce 16
+	COMMA  reduce 16
+	SEMICOLON  reduce 16
+	RPAREN  reduce 16
+	RBRACK  reduce 16
+	RBRACE  reduce 16
+	EQ  reduce 16
+	NEQ  reduce 16
+	LT  reduce 16
+	LE  reduce 16
+	GT  reduce 16
+	GE  reduce 16
+	AND  reduce 16
+	OR  reduce 16
+	THEN  reduce 16
+	ELSE  reduce 16
+	TO  reduce 16
+	DO  reduce 16
+	IN  reduce 16
+	END  reduce 16
+	FUNCTION  reduce 16
+	VAR  reduce 16
+	TYPE  reduce 16
+
+
+state 68
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp LT exp .  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	$end  reduce 17
+	COMMA  reduce 17
+	SEMICOLON  reduce 17
+	RPAREN  reduce 17
+	RBRACK  reduce 17
+	RBRACE  reduce 17
+	EQ  reduce 17
+	NEQ  reduce 17
+	LT  reduce 17
+	LE  reduce 17
+	GT  reduce 17
+	GE  reduce 17
+	AND  reduce 17
+	OR  reduce 17
+	THEN  reduce 17
+	ELSE  reduce 17
+	TO  reduce 17
+	DO  reduce 17
+	IN  reduce 17
+	END  reduce 17
+	FUNCTION  reduce 17
+	VAR  reduce 17
+	TYPE  reduce 17
+
+
+state 69
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp LE exp .  (19)
+	exp : exp . GE exp  (20)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	$end  reduce 19
+	COMMA  reduce 19
+	SEMICOLON  reduce 19
+	RPAREN  reduce 19
+	RBRACK  reduce 19
+	RBRACE  reduce 19
+	EQ  reduce 19
+	NEQ  reduce 19
+	LT  reduce 19
+	LE  reduce 19
+	GT  reduce 19
+	GE  reduce 19
+	AND  reduce 19
+	OR  reduce 19
+	THEN  reduce 19
+	ELSE  reduce 19
+	TO  reduce 19
+	DO  reduce 19
+	IN  reduce 19
+	END  reduce 19
+	FUNCTION  reduce 19
+	VAR  reduce 19
+	TYPE  reduce 19
+
+
+state 70
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp GT exp .  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	$end  reduce 18
+	COMMA  reduce 18
+	SEMICOLON  reduce 18
+	RPAREN  reduce 18
+	RBRACK  reduce 18
+	RBRACE  reduce 18
+	EQ  reduce 18
+	NEQ  reduce 18
+	LT  reduce 18
+	LE  reduce 18
+	GT  reduce 18
+	GE  reduce 18
+	AND  reduce 18
+	OR  reduce 18
+	THEN  reduce 18
+	ELSE  reduce 18
+	TO  reduce 18
+	DO  reduce 18
+	IN  reduce 18
+	END  reduce 18
+	FUNCTION  reduce 18
+	VAR  reduce 18
+	TYPE  reduce 18
+
+
+state 71
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : exp GE exp .  (20)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	$end  reduce 20
+	COMMA  reduce 20
+	SEMICOLON  reduce 20
+	RPAREN  reduce 20
+	RBRACK  reduce 20
+	RBRACE  reduce 20
+	EQ  reduce 20
+	NEQ  reduce 20
+	LT  reduce 20
+	LE  reduce 20
+	GT  reduce 20
+	GE  reduce 20
+	AND  reduce 20
+	OR  reduce 20
+	THEN  reduce 20
+	ELSE  reduce 20
+	TO  reduce 20
+	DO  reduce 20
+	IN  reduce 20
+	END  reduce 20
+	FUNCTION  reduce 20
+	VAR  reduce 20
+	TYPE  reduce 20
+
+
+state 72
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp AND exp .  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	$end  reduce 10
+	COMMA  reduce 10
+	SEMICOLON  reduce 10
+	RPAREN  reduce 10
+	RBRACK  reduce 10
+	RBRACE  reduce 10
+	AND  reduce 10
+	OR  reduce 10
+	THEN  reduce 10
+	ELSE  reduce 10
+	TO  reduce 10
+	DO  reduce 10
+	IN  reduce 10
+	END  reduce 10
+	FUNCTION  reduce 10
+	VAR  reduce 10
+	TYPE  reduce 10
+
+
+state 73
+	exp : exp . OR exp  (9)
+	exp : exp OR exp .  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	$end  reduce 9
+	COMMA  reduce 9
+	SEMICOLON  reduce 9
+	RPAREN  reduce 9
+	RBRACK  reduce 9
+	RBRACE  reduce 9
+	OR  reduce 9
+	THEN  reduce 9
+	ELSE  reduce 9
+	TO  reduce 9
+	DO  reduce 9
+	IN  reduce 9
+	END  reduce 9
+	FUNCTION  reduce 9
+	VAR  reduce 9
+	TYPE  reduce 9
+
+
+state 74
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	lvalue : lvalue LBRACK exp . RBRACK  (34)
+
+	RBRACK  shift 92
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	.  error
+
+
+state 75
+	lvalue : lvalue DOT id .  (32)
+
+	.  reduce 32
+
+
+state 76
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : lvalue ASSIGN exp .  (23)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	$end  reduce 23
+	COMMA  reduce 23
+	SEMICOLON  reduce 23
+	RPAREN  reduce 23
+	RBRACK  reduce 23
+	RBRACE  reduce 23
+	THEN  reduce 23
+	ELSE  reduce 23
+	TO  reduce 23
+	DO  reduce 23
+	IN  reduce 23
+	END  reduce 23
+	FUNCTION  reduce 23
+	VAR  reduce 23
+	TYPE  reduce 23
+
+
+state 77
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	explist : exp .  (40)
+	explist : exp . COMMA explist  (41)
+
+	COMMA  shift 93
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	RPAREN  reduce 40
+
+
+state 78
+	exp : id LPAREN explist . RPAREN  (21)
+
+	RPAREN  shift 94
+	.  error
+
+
+state 79
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : id LBRACK exp . RBRACK OF exp  (24)
+	lvalue : id LBRACK exp . RBRACK  (33)
+
+	RBRACK  shift 95
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	.  error
+
+
+state 80
+	exp : id LBRACE efieldlist . RBRACE  (22)
+
+	RBRACE  shift 96
+	.  error
+
+
+state 81
+	efieldlist : efield .  (37)
+	efieldlist : efield . COMMA efieldlist  (38)
+
+	COMMA  shift 97
+	RBRACE  reduce 37
+
+
+state 82
+	efield : id . EQ exp  (36)
+
+	EQ  shift 98
+	.  error
+
+
+state 83
+	expseq : exp SEMICOLON expseq .  (44)
+
+	.  reduce 44
+
+
+state 84
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : IF exp THEN exp . ELSE exp  (25)
+	exp : IF exp THEN exp .  (26)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	ELSE  shift 99
+	$end  reduce 26
+	COMMA  reduce 26
+	SEMICOLON  reduce 26
+	RPAREN  reduce 26
+	RBRACK  reduce 26
+	RBRACE  reduce 26
+	THEN  reduce 26
+	TO  reduce 26
+	DO  reduce 26
+	IN  reduce 26
+	END  reduce 26
+	FUNCTION  reduce 26
+	VAR  reduce 26
+	TYPE  reduce 26
+
+
+state 85
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : WHILE exp DO exp .  (27)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	$end  reduce 27
+	COMMA  reduce 27
+	SEMICOLON  reduce 27
+	RPAREN  reduce 27
+	RBRACK  reduce 27
+	RBRACE  reduce 27
+	THEN  reduce 27
+	ELSE  reduce 27
+	TO  reduce 27
+	DO  reduce 27
+	IN  reduce 27
+	END  reduce 27
+	FUNCTION  reduce 27
+	VAR  reduce 27
+	TYPE  reduce 27
+
+
+state 86
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : FOR id ASSIGN exp . TO exp DO exp  (28)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	TO  shift 100
+	.  error
+
+
+state 87
+	fundec : FUNCTION id LPAREN . tyfields RPAREN EQ exp  (59)
+	fundec : FUNCTION id LPAREN . tyfields RPAREN COLON id EQ exp  (60)
+	tyfields : .  (56)
+
+	ID  shift 1
+	RPAREN  reduce 56
+
+	tyfields  goto 101
+	tyfield  goto 102
+	id  goto 103
+
+
+state 88
+	dec : VAR id COLON . id ASSIGN exp  (49)
+
+	ID  shift 1
+	.  error
+
+	id  goto 104
+
+
+state 89
+	dec : VAR id ASSIGN . exp  (48)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 105
+	lvalue  goto 14
+	id  goto 15
+
+
+state 90
+	tydec : TYPE id EQ . ty  (63)
+
+	ID  shift 1
+	LBRACE  shift 106
+	ARRAY  shift 107
+	.  error
+
+	ty  goto 108
+	id  goto 109
+
+
+state 91
+	exp : LET declist IN seqexp . END  (30)
+
+	END  shift 110
+	.  error
+
+
+state 92
+	lvalue : lvalue LBRACK exp RBRACK .  (34)
+
+	.  reduce 34
+
+
+state 93
+	explist : exp COMMA . explist  (41)
+	explist : .  (39)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	RPAREN  reduce 39
+
+	exp  goto 77
+	explist  goto 111
+	lvalue  goto 14
+	id  goto 15
+
+
+state 94
+	exp : id LPAREN explist RPAREN .  (21)
+
+	.  reduce 21
+
+
+state 95
+	exp : id LBRACK exp RBRACK . OF exp  (24)
+	lvalue : id LBRACK exp RBRACK .  (33)
+
+	OF  shift 112
+	$end  reduce 33
+	COMMA  reduce 33
+	SEMICOLON  reduce 33
+	RPAREN  reduce 33
+	LBRACK  reduce 33
+	RBRACK  reduce 33
+	RBRACE  reduce 33
+	DOT  reduce 33
+	PLUS  reduce 33
+	MINUS  reduce 33
+	TIMES  reduce 33
+	DIVIDE  reduce 33
+	EQ  reduce 33
+	NEQ  reduce 33
+	LT  reduce 33
+	LE  reduce 33
+	GT  reduce 33
+	GE  reduce 33
+	AND  reduce 33
+	OR  reduce 33
+	ASSIGN  reduce 33
+	THEN  reduce 33
+	ELSE  reduce 33
+	TO  reduce 33
+	DO  reduce 33
+	IN  reduce 33
+	END  reduce 33
+	FUNCTION  reduce 33
+	VAR  reduce 33
+	TYPE  reduce 33
+
+
+state 96
+	exp : id LBRACE efieldlist RBRACE .  (22)
+
+	.  reduce 22
+
+
+state 97
+	efieldlist : efield COMMA . efieldlist  (38)
+	efield : .  (35)
+
+	ID  shift 1
+	COMMA  reduce 35
+	RBRACE  reduce 35
+
+	efieldlist  goto 113
+	efield  goto 81
+	id  goto 82
+
+
+state 98
+	efield : id EQ . exp  (36)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 114
+	lvalue  goto 14
+	id  goto 15
+
+
+state 99
+	exp : IF exp THEN exp ELSE . exp  (25)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 115
+	lvalue  goto 14
+	id  goto 15
+
+
+state 100
+	exp : FOR id ASSIGN exp TO . exp DO exp  (28)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 116
+	lvalue  goto 14
+	id  goto 15
+
+
+state 101
+	fundec : FUNCTION id LPAREN tyfields . RPAREN EQ exp  (59)
+	fundec : FUNCTION id LPAREN tyfields . RPAREN COLON id EQ exp  (60)
+
+	RPAREN  shift 117
+	.  error
+
+
+state 102
+	tyfields : tyfield .  (57)
+	tyfields : tyfield . COMMA tyfields  (58)
+
+	COMMA  shift 118
+	RPAREN  reduce 57
+	RBRACE  reduce 57
+
+
+state 103
+	tyfield : id . COLON id  (55)
+
+	COLON  shift 119
+	.  error
+
+
+state 104
+	dec : VAR id COLON id . ASSIGN exp  (49)
+
+	ASSIGN  shift 120
+	.  error
+
+
+state 105
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	dec : VAR id ASSIGN exp .  (48)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	IN  reduce 48
+	FUNCTION  reduce 48
+	VAR  reduce 48
+	TYPE  reduce 48
+
+
+state 106
+	ty : LBRACE . tyfields RBRACE  (53)
+	tyfields : .  (56)
+
+	ID  shift 1
+	RBRACE  reduce 56
+
+	tyfields  goto 121
+	tyfield  goto 102
+	id  goto 103
+
+
+state 107
+	ty : ARRAY . OF id  (54)
+
+	OF  shift 122
+	.  error
+
+
+state 108
+	tydec : TYPE id EQ ty .  (63)
+
+	.  reduce 63
+
+
+state 109
+	ty : id .  (52)
+
+	.  reduce 52
+
+
+state 110
+	exp : LET declist IN seqexp END .  (30)
+
+	.  reduce 30
+
+
+state 111
+	explist : exp COMMA explist .  (41)
+
+	.  reduce 41
+
+
+state 112
+	exp : id LBRACK exp RBRACK OF . exp  (24)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 123
+	lvalue  goto 14
+	id  goto 15
+
+
+state 113
+	efieldlist : efield COMMA efieldlist .  (38)
+
+	.  reduce 38
+
+
+state 114
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	efield : id EQ exp .  (36)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	COMMA  reduce 36
+	RBRACE  reduce 36
+
+
+state 115
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : IF exp THEN exp ELSE exp .  (25)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	$end  reduce 25
+	COMMA  reduce 25
+	SEMICOLON  reduce 25
+	RPAREN  reduce 25
+	RBRACK  reduce 25
+	RBRACE  reduce 25
+	THEN  reduce 25
+	ELSE  reduce 25
+	TO  reduce 25
+	DO  reduce 25
+	IN  reduce 25
+	END  reduce 25
+	FUNCTION  reduce 25
+	VAR  reduce 25
+	TYPE  reduce 25
+
+
+state 116
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : FOR id ASSIGN exp TO exp . DO exp  (28)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	DO  shift 124
+	.  error
+
+
+state 117
+	fundec : FUNCTION id LPAREN tyfields RPAREN . EQ exp  (59)
+	fundec : FUNCTION id LPAREN tyfields RPAREN . COLON id EQ exp  (60)
+
+	COLON  shift 125
+	EQ  shift 126
+	.  error
+
+
+state 118
+	tyfields : tyfield COMMA . tyfields  (58)
+	tyfields : .  (56)
+
+	ID  shift 1
+	RPAREN  reduce 56
+	RBRACE  reduce 56
+
+	tyfields  goto 127
+	tyfield  goto 102
+	id  goto 103
+
+
+state 119
+	tyfield : id COLON . id  (55)
+
+	ID  shift 1
+	.  error
+
+	id  goto 128
+
+
+state 120
+	dec : VAR id COLON id ASSIGN . exp  (49)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 129
+	lvalue  goto 14
+	id  goto 15
+
+
+state 121
+	ty : LBRACE tyfields . RBRACE  (53)
+
+	RBRACE  shift 130
+	.  error
+
+
+state 122
+	ty : ARRAY OF . id  (54)
+
+	ID  shift 1
+	.  error
+
+	id  goto 131
+
+
+state 123
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : id LBRACK exp RBRACK OF exp .  (24)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	$end  reduce 24
+	COMMA  reduce 24
+	SEMICOLON  reduce 24
+	RPAREN  reduce 24
+	RBRACK  reduce 24
+	RBRACE  reduce 24
+	THEN  reduce 24
+	ELSE  reduce 24
+	TO  reduce 24
+	DO  reduce 24
+	IN  reduce 24
+	END  reduce 24
+	FUNCTION  reduce 24
+	VAR  reduce 24
+	TYPE  reduce 24
+
+
+state 124
+	exp : FOR id ASSIGN exp TO exp DO . exp  (28)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 132
+	lvalue  goto 14
+	id  goto 15
+
+
+state 125
+	fundec : FUNCTION id LPAREN tyfields RPAREN COLON . id EQ exp  (60)
+
+	ID  shift 1
+	.  error
+
+	id  goto 133
+
+
+state 126
+	fundec : FUNCTION id LPAREN tyfields RPAREN EQ . exp  (59)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 134
+	lvalue  goto 14
+	id  goto 15
+
+
+state 127
+	tyfields : tyfield COMMA tyfields .  (58)
+
+	.  reduce 58
+
+
+state 128
+	tyfield : id COLON id .  (55)
+
+	.  reduce 55
+
+
+state 129
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	dec : VAR id COLON id ASSIGN exp .  (49)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	IN  reduce 49
+	FUNCTION  reduce 49
+	VAR  reduce 49
+	TYPE  reduce 49
+
+
+state 130
+	ty : LBRACE tyfields RBRACE .  (53)
+
+	.  reduce 53
+
+
+state 131
+	ty : ARRAY OF id .  (54)
+
+	.  reduce 54
+
+
+state 132
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	exp : FOR id ASSIGN exp TO exp DO exp .  (28)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	$end  reduce 28
+	COMMA  reduce 28
+	SEMICOLON  reduce 28
+	RPAREN  reduce 28
+	RBRACK  reduce 28
+	RBRACE  reduce 28
+	THEN  reduce 28
+	ELSE  reduce 28
+	TO  reduce 28
+	DO  reduce 28
+	IN  reduce 28
+	END  reduce 28
+	FUNCTION  reduce 28
+	VAR  reduce 28
+	TYPE  reduce 28
+
+
+state 133
+	fundec : FUNCTION id LPAREN tyfields RPAREN COLON id . EQ exp  (60)
+
+	EQ  shift 135
+	.  error
+
+
+state 134
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	fundec : FUNCTION id LPAREN tyfields RPAREN EQ exp .  (59)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	IN  reduce 59
+	FUNCTION  reduce 59
+	VAR  reduce 59
+	TYPE  reduce 59
+
+
+state 135
+	fundec : FUNCTION id LPAREN tyfields RPAREN COLON id EQ . exp  (60)
+
+	ID  shift 1
+	STRING  shift 2
+	INT  shift 3
+	LPAREN  shift 4
+	MINUS  shift 5
+	IF  shift 6
+	WHILE  shift 7
+	FOR  shift 8
+	LET  shift 9
+	BREAK  shift 10
+	NIL  shift 11
+	.  error
+
+	exp  goto 136
+	lvalue  goto 14
+	id  goto 15
+
+
+state 136
+	exp : exp . OR exp  (9)
+	exp : exp . AND exp  (10)
+	exp : exp . PLUS exp  (11)
+	exp : exp . MINUS exp  (12)
+	exp : exp . TIMES exp  (13)
+	exp : exp . DIVIDE exp  (14)
+	exp : exp . EQ exp  (15)
+	exp : exp . NEQ exp  (16)
+	exp : exp . LT exp  (17)
+	exp : exp . GT exp  (18)
+	exp : exp . LE exp  (19)
+	exp : exp . GE exp  (20)
+	fundec : FUNCTION id LPAREN tyfields RPAREN COLON id EQ exp .  (60)
+
+	PLUS  shift 32
+	MINUS  shift 33
+	TIMES  shift 34
+	DIVIDE  shift 35
+	EQ  shift 36
+	NEQ  shift 37
+	LT  shift 38
+	LE  shift 39
+	GT  shift 40
+	GE  shift 41
+	AND  shift 42
+	OR  shift 43
+	IN  reduce 60
+	FUNCTION  reduce 60
+	VAR  reduce 60
+	TYPE  reduce 60
+
+
+State 15 contains 1 shift/reduce conflict.
+State 28 contains 1 shift/reduce conflict.
+State 30 contains 1 shift/reduce conflict.
+
+
+46 terminals, 19 nonterminals
+66 grammar rules, 137 states
